@@ -1,0 +1,15 @@
+{
+  "compileOnSave": true,
+  "compilerOptions": {
+    "declaration": true,
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "noEmitOnError": false,
+    "noImplicitAny": false,
+    "outDir": "dist/",
+    "removeComments": false,
+    "sourceMap": true,
+    "sourceRoot": "src/",
+    "target": "es5"
+  }
+}
