@@ -3,8 +3,7 @@ import {IHomeId, INodeInfo, IValue, IValueId, OZW} from './openzwave-shared';
 import {Client} from "hemtjanst/lib/hemtjanst";
 import {Device, DeviceType} from "hemtjanst/lib/device";
 import {ZVagNode} from "./node";
-import {IChange} from "./value";
-import {ZVagValue} from "../../dist/lib/value";
+import {ZVagValue, IChange} from "./value";
 
 import * as dbgModule from "debug";
 let debug = dbgModule("zvag");

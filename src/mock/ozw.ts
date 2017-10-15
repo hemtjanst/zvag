@@ -1,4 +1,4 @@
-import {iNodeId, OZW} from "../lib/openzwave-shared";
+import {OZW} from "../lib/openzwave-shared";
 
 
 export function OzwMock(): OZW {
