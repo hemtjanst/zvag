@@ -108,7 +108,7 @@ export class ZVag {
 
                 if (featureCnt > 0) {
                     for (let ft in features) {
-                        if (!features.hasOwnProperty(i)) continue;
+                        if (!features.hasOwnProperty(ft)) continue;
                         let ftName = ft;
                         let value: ZVagValue = features[ft][0];
                         let meta: FeatureMeta = features[ft][1];
@@ -125,7 +125,7 @@ export class ZVag {
                     this.devices[topic] = dev;
 
                     for (let ft in features) {
-                        if (!features.hasOwnProperty(i)) continue;
+                        if (!features.hasOwnProperty(ft)) continue;
                         let value: ZVagValue = features[ft][0];
                         let ftName = ft;
                         if (value) {
