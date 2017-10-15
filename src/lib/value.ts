@@ -49,8 +49,8 @@ export class ZVagValue implements IValue {
             case 37:
                 val = (value==="1" ? 1 : 0);
                 break;
-            case 39:
-                val = parseInt(value);
+            /*case 39:
+                val = parseInt(value);*/
         }
 
         if (value !== undefined) {
@@ -87,7 +87,7 @@ export class ZVagValue implements IValue {
     public feature(): {name: string, meta: FeatureMeta} {
         switch(this.class_id) {
             case 37: return {name: "on", meta: {}};
-            case 39: return {name: "brightness", meta: {}};
+            //case 39: return {name: "brightness", meta: {}};
             //case 49: return {name: "powerLevel", meta: {}};
 
         }
