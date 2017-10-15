@@ -46,10 +46,10 @@ export class ZVagValue implements IValue {
     public set(ozw: OZW, value: string) {
         let val = undefined;
         switch(this.class_id) {
-            case 36:
+            case 37:
                 val = (value==="1" ? 1 : 0);
                 break;
-            case 37:
+            case 39:
                 val = parseInt(value);
         }
 
@@ -86,8 +86,8 @@ export class ZVagValue implements IValue {
 
     public feature(): {name: string, meta: FeatureMeta} {
         switch(this.class_id) {
-            case 36: return {name: "on", meta: {}};
-            case 37: return {name: "brightness", meta: {}};
+            case 37: return {name: "on", meta: {}};
+            case 39: return {name: "brightness", meta: {}};
             //case 49: return {name: "powerLevel", meta: {}};
 
         }
