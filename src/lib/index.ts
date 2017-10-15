@@ -6,6 +6,7 @@ import {ZVagNode} from "./node";
 import {ZVagValue, IChange} from "./value";
 
 import * as dbgModule from "debug";
+import {FeatureMeta} from "hemtjanst/lib/feature";
 let debug = dbgModule("zvag");
 
 export type ZVagOpts = {
@@ -89,42 +90,58 @@ export class ZVag {
                     lastWillID: this.opts.clientId,
                 });
 
-                let features = [];
+                let features = {};
+                let featureCnt = 0;
 
                 for (let value of node.getValues()) {
                     let ft = value.feature();
                     if (ft) {
                         debug(`Found feature ${ft.name} in ${topic}`);
-                        features.push([value, ft.name, ft.meta]);
+                        features[ft.name] = [value, ft.meta];
+                        featureCnt++;
                     }
                 }
 
-                if (features.length > 0) {
-                    for (let ft of features) {
-                        let value: ZVagValue = ft[0];
-                        dev.addFeature(ft[1], ft[2]);
-                        dev.onSet(ft[1], (d,f,v) => {
-                            debug(`Setting ${topic}/${f} to ${v}`);
-                            value.set(this.zwave, v);
-                        });
+                if (type == DeviceType.Outlet && !features['outletInUse']) {
+                    features['outletInUse'] = [undefined, {}];
+                }
+
+                if (featureCnt > 0) {
+                    for (let ft in features) {
+                        if (!features.hasOwnProperty(i)) continue;
+                        let ftName = ft;
+                        let value: ZVagValue = features[ft][0];
+                        let meta: FeatureMeta = features[ft][1];
+                        dev.addFeature(ftName, meta);
+                        if (value) {
+                            dev.onSet(ft[1], (d, f, v) => {
+                                debug(`Setting ${topic}/${f} to ${v}`);
+                                value.set(this.zwave, v);
+                            });
+                        }
                     }
 
                     this.ht.AddDevice(dev);
                     this.devices[topic] = dev;
 
-                    for (let ft of features) {
-                        let value: ZVagValue = ft[0];
-                        let ftName = ft[1];
-                        value.on('update', (changes: IChange[]) => {
-                            for (let ch of changes) {
-                                if (ch.name !== "value") continue;
-                                dev.update(ftName, ch.cur);
-                                debug(`Updating ${topic}/${ftName} from ${ch.old} to ${ch.cur}`);
-                            }
-                        });
+                    for (let ft in features) {
+                        if (!features.hasOwnProperty(i)) continue;
+                        let value: ZVagValue = features[ft][0];
+                        let ftName = ft;
+                        if (value) {
+                            value.on('update', (changes: IChange[]) => {
+                                for (let ch of changes) {
+                                    if (ch.name !== "value") continue;
+                                    dev.update(ftName, ch.cur);
+                                    debug(`Updating ${topic}/${ftName} from ${ch.old} to ${ch.cur}`);
+                                }
+                            });
 
-                        dev.update(ftName, value.value);
-                        debug(`Setting ${topic}/${ftName} to ${value.value}`);
+                            dev.update(ftName, value.value);
+                            debug(`Setting ${topic}/${ftName} to ${value.value}`);
+                        } else if (ft.toLowerCase() == "outletinuse") {
+                            dev.update(ftName, 1);
+                        }
                     }
                 }
 

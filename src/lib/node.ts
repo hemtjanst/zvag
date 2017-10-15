@@ -21,6 +21,9 @@ export class ZVagNode {
 
     public getType(): DeviceType {
         switch(this.info.type) {
+            case "Power Strip":
+            case "On/Off Power Switch":
+                return DeviceType.Outlet;
             case "Door Lock Keypad": return DeviceType.LockManagement;
             case "Fan Switch": return DeviceType.Fan;
             case "Light Dimmer Switch": return DeviceType.Lightbulb;
