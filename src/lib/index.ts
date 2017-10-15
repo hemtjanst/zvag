@@ -7,6 +7,7 @@ import {ZVagValue, IChange} from "./value";
 
 import * as dbgModule from "debug";
 import {FeatureMeta} from "hemtjanst/lib/feature";
+import {utils} from "hemtjanst/lib/utils";
 let debug = dbgModule("zvag");
 
 export type ZVagOpts = {
@@ -68,14 +69,7 @@ export class ZVag {
                 let node = this.nodes[i];
                 let name = this.opts.name + i;
                 let type = node.getType();
-                let typeStr = "switch";
-
-                for (let t in DeviceType) {
-                    if (DeviceType[t] === type) {
-                        typeStr = t.toLowerCase();
-                    }
-                }
-
+                let typeStr = utils.typeName(type, DeviceType);
                 let topic = typeStr+"/"+name;
 
                 if (typeof this.devices[topic] !== "undefined") {
@@ -114,7 +108,7 @@ export class ZVag {
                         let meta: FeatureMeta = features[ft][1];
                         dev.addFeature(ftName, meta);
                         if (value) {
-                            dev.onSet(ft[1], (d, f, v) => {
+                            dev.onSet(ftName, (d, f, v) => {
                                 debug(`Setting ${topic}/${f} to ${v}`);
                                 value.set(this.zwave, v);
                             });
