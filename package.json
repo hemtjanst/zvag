@@ -5,9 +5,12 @@
   "main": "index.js",
   "dependencies": {
     "debug": "^3.1.0",
+    "deep-equals": "0.0.2",
     "hemtjanst": "0.0.4",
     "mqtt": "^2.13.0",
-    "openzwave-shared": "^1.4.0"
+    "openzwave-shared": "^1.4.0",
+    "command-line-args": "4.0.7",
+    "command-line-usage": "4.0.1"
   },
   "devDependencies": {
     "@types/node": "^8.0.34",
