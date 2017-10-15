@@ -44,6 +44,18 @@ export class ZVagValue implements IValue {
     }
 
     public set(ozw: OZW, value: string) {
+        let val = undefined;
+        switch(this.class_id) {
+            case 36:
+                val = (value==="1" ? 1 : 0);
+                break;
+            case 37:
+                val = parseInt(value);
+        }
+
+        if (value !== undefined) {
+            ozw.setValue(this.getId(), val);
+        }
 
     }
 

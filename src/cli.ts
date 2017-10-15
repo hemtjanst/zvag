@@ -69,6 +69,8 @@ if (args.help) {
         }
     ]))
 } else {
+    let clientId = "zvag-" + Math.floor((Math.random() * 10000000) + 1);
+
     let zwave = new OZW({
         Logging: false,
         ConsoleOutput: false
@@ -77,10 +79,19 @@ if (args.help) {
     zwave.connect(args.device);
     let mqtt = connect(args.mqtt, {
         keepalive: 30,
-        clientId: `zvag`
+        clientId: clientId,
+        will: {
+            topic: "leave",
+            payload: clientId,
+            qos: 1,
+            retain: false
+        }
     });
 
     let hemtjanst = new Client(mqtt);
 
-    new ZVag(zwave, hemtjanst, {name: args.name});
+    new ZVag(zwave, hemtjanst, {
+        name: args.name,
+        clientId: clientId
+    });
 }

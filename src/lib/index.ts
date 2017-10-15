@@ -104,7 +104,8 @@ export class ZVag {
                     for (let ft of features) {
                         let value: ZVagValue = ft[0];
                         dev.addFeature(ft[1], ft[2]);
-                        dev.onSet(ft[1], (v) => {
+                        dev.onSet(ft[1], (d,f,v) => {
+                            debug(`Setting ${topic}/${f} to ${v}`);
                             value.set(this.zwave, v);
                         });
                     }
