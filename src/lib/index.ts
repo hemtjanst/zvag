@@ -81,6 +81,7 @@ export class ZVag {
                     type: type,
                     manufacturer: node.info.manufacturer,
                     model: node.info.product,
+                    serialNumber: "Z-Wave Node " + i,
                     lastWillID: this.opts.clientId,
                 });
 

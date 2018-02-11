@@ -53,7 +53,7 @@ export class ZVagValue implements IValue {
                 val = parseInt(value);*/
         }
 
-        if (value !== undefined) {
+        if (val !== undefined) {
             ozw.setValue(this.getId(), val);
         }
 
@@ -87,6 +87,14 @@ export class ZVagValue implements IValue {
     public feature(): {name: string, meta: FeatureMeta} {
         switch(this.class_id) {
             case 37: return {name: "on", meta: {}};
+            case 50:
+                switch(this.index) {
+                    case 0: return {name: "energyUsed", meta: {}};
+                    case 8: return {name: "currentPower", meta: {}};
+                    case 16: return {name: "currentVoltage", meta: {}};
+                    case 20: return {name: "currentAmpere", meta: {}};
+                }
+
             //case 39: return {name: "brightness", meta: {}};
             //case 49: return {name: "powerLevel", meta: {}};
 
