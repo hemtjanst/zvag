@@ -30,7 +30,7 @@ export class ZVagNode {
             case "Smoke Alarm Sensor": return DeviceType.SmokeSensor;
             case "CO Alarm Sensor": return DeviceType.CarbonMonoxideSensor;
             case "CO2 Alarm Sensor": return DeviceType.CarbonDioxideSensor;
-            case "Home Security Sensor": return DeviceType.MotionSensor;
+            case "Home Security Sensor": return DeviceType.ContactSensor;
             case "Air Temperature Sensor": return DeviceType.TemperatureSensor;
             case "Luminance Sensor": return DeviceType.LightSensor;
             case "Humidity Sensor": return DeviceType.HumiditySensor;

@@ -62,6 +62,14 @@ export class ZVag {
         }
     }
 
+    private mapValue(item, value): string {
+        if (item.class_id == 113 && item.index == 9) {
+            value = (value == 23 ? '0' : '1');
+        }
+        return value;
+    }
+
+
     private createDevices() {
 
         for (let i in this.nodes) {
@@ -86,33 +94,42 @@ export class ZVag {
                 });
 
                 let features = {};
+                let featureMeta = {};
                 let featureCnt = 0;
 
                 for (let value of node.getValues()) {
                     let ft = value.feature();
                     if (ft) {
                         debug(`Found feature ${ft.name} in ${topic}`);
-                        features[ft.name] = [value, ft.meta];
-                        featureCnt++;
+                        if (features.hasOwnProperty(ft.name)) {
+                            features[ft.name].push(value);
+                        } else {
+                            features[ft.name] = [value];
+                            featureCnt++;
+                        }
+                        featureMeta[ft.name] = ft.meta;
                     }
                 }
 
                 if (type == DeviceType.Outlet && !features['outletInUse']) {
-                    features['outletInUse'] = [undefined, {}];
+                    features['outletInUse'] = [];
+                    featureMeta['outletInUse'] = {};
                 }
 
                 if (featureCnt > 0) {
                     for (let ft in features) {
                         if (!features.hasOwnProperty(ft)) continue;
                         let ftName = ft;
-                        let value: ZVagValue = features[ft][0];
-                        let meta: FeatureMeta = features[ft][1];
+                        let meta: FeatureMeta = featureMeta[ft];
                         dev.addFeature(ftName, meta);
-                        if (value) {
-                            dev.onSet(ftName, (d, f, v) => {
-                                debug(`Setting ${topic}/${f} to ${v}`);
-                                value.set(this.zwave, v);
-                            });
+                        for (let k in features[ft]) {
+                            let value: ZVagValue = features[ft][k];
+                            if (value) {
+                                dev.onSet(ftName, (d, f, v) => {
+                                    debug(`Setting ${topic}/${f} to ${v}`);
+                                    value.set(this.zwave, v);
+                                });
+                            }
                         }
                     }
 
@@ -121,21 +138,24 @@ export class ZVag {
 
                     for (let ft in features) {
                         if (!features.hasOwnProperty(ft)) continue;
-                        let value: ZVagValue = features[ft][0];
-                        let ftName = ft;
-                        if (value) {
-                            value.on('update', (changes: IChange[]) => {
-                                for (let ch of changes) {
-                                    if (ch.name !== "value") continue;
-                                    dev.update(ftName, ch.cur);
-                                    debug(`Updating ${topic}/${ftName} from ${ch.old} to ${ch.cur}`);
-                                }
-                            });
-
-                            dev.update(ftName, value.value);
-                            debug(`Setting ${topic}/${ftName} to ${value.value}`);
-                        } else if (ft.toLowerCase() == "outletinuse") {
-                            dev.update(ftName, 1);
+                        for (let k in features[ft]) {
+                            let value: ZVagValue = features[ft][k];
+                            let ftName = ft;
+                            if (value) {
+                                value.on('update', (changes: IChange[]) => {
+                                    for (let ch of changes) {
+                                        if (ch.name !== "value") continue;
+                                        let nv = this.mapValue(value, ch.cur);
+                                        dev.update(ftName, nv);
+                                        debug(`Updating ${topic}/${ftName} from ${ch.old} to ${ch.cur} (${nv})`);
+                                    }
+                                });
+                                let nv = this.mapValue(value, value.value);
+                                dev.update(ftName, nv);
+                                debug(`Setting ${topic}/${ftName} to ${value.value} (${nv})`);
+                            } else if (ft.toLowerCase() == "outletinuse") {
+                                dev.update(ftName, 1);
+                            }
                         }
                     }
                 }

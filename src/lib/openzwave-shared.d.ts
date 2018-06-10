@@ -67,10 +67,10 @@ export class OZW {
 
     /**
      * Set a value
-     * @param {iNodeId} node_id
-     * @param {iClassId} class_id
-     * @param {iInstance} instance
-     * @param {iIndex} index
+     * @param {INodeId} node_id
+     * @param {IClassId} class_id
+     * @param {IInstance} instance
+     * @param {IIndex} index
      * @param value
      */
     setValue(node_id: INodeId|IValueId, class_id: IClassId|any, instance?: IInstance, index?: IIndex, value?: any)
@@ -84,7 +84,7 @@ export class OZW {
 
     /**
      * Turn a binary switch off
-     * @param {iNodeId} node_id
+     * @param {INodeId} node_id
      */
     setNodeOff(node_id: INodeId)
 
@@ -97,14 +97,14 @@ export class OZW {
 
     /**
      * Set location string
-     * @param {iNodeId} node_id
+     * @param {INodeId} node_id
      * @param {string} location
      */
     setNodeLocation(node_id: INodeId, location: string)
 
     /**
      * Set node name
-     * @param {iNodeId} node_id
+     * @param {INodeId} node_id
      * @param {string} name
      */
     setNodeName(node_id: INodeId, name: string)

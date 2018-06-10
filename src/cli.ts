@@ -2,11 +2,13 @@ import * as cliArgs from "command-line-args";
 import * as cliUsage from "command-line-usage";
 import {connect} from "mqtt";
 
-import * as OZW from "openzwave-shared";
 import {ZVag} from "./lib/index";
 import {Client} from "hemtjanst/lib/hemtjanst";
 
 import * as dbgModule from "debug";
+import {ZVagProxy} from "./lib/proxy";
+import {OZW} from "./lib/openzwave-shared";
+import {MqttOzw} from "./lib/mqttOzw";
 let debug = dbgModule("zvag");
 let version = "0.0.1";
 
@@ -37,6 +39,25 @@ let opts = [
         alias: 'h',
         type: Boolean,
         description: 'Show this help'
+    },
+    {
+        name: 'proxy',
+        alias: 'p',
+        type: Boolean,
+        description: 'Run in proxy mode'
+    },
+    {
+        name: 'client',
+        alias: 'c',
+        type: Boolean,
+        description: 'Run in client mode'
+    },
+    {
+        name: 'proxyName',
+        alias: 'r',
+        type: String,
+        description: "--name used on proxy side (prefixes topics for reading and writing raw data)",
+        typeLabel: '[underline]{zwave}'
     }
 ];
 
@@ -51,7 +72,9 @@ if (!args.mqtt) {
 if (!args.name) {
     args.name = "zwave";
 }
-
+if (!args.proxyName) {
+    args.proxyName = "zwave";
+}
 
 if (args.help) {
     console.log(cliUsage([
@@ -61,7 +84,7 @@ if (args.help) {
         },
         {
             header: `Usage`,
-            content: `zvag -a [italic]{tcp://127.0.0.1:1883} -d [italic]{/dev/ttyUSB0}`
+            content: `zvag -a [italic]{tcp://127.0.0.1:1883} -d [italic]{/dev/ttyUSB0} [-p] [-e [italic]{zwave/}]`
         },
         {
             header: `Options`,
@@ -71,27 +94,48 @@ if (args.help) {
 } else {
     let clientId = "zvag-" + Math.floor((Math.random() * 10000000) + 1);
 
-    let zwave = new OZW({
-        Logging: false,
-        ConsoleOutput: false
-    });
+    let zwave: OZW;
+
+    if (!args.client) {
+        const OZW = require('openzwave-shared');
+        zwave = new OZW({
+            Logging: false,
+            ConsoleOutput: false
+        });
+    } else {
+        let mqtt = connect(args.mqtt, { keepalive: 30 });
+        debug('Creating mqtt -> Z-Wave client');
+        zwave = new MqttOzw({
+            mqtt: mqtt,
+            name: args.proxyName
+        });
+    }
 
     zwave.connect(args.device);
-    let mqtt = connect(args.mqtt, {
-        keepalive: 30,
-        clientId: clientId,
-        will: {
-            topic: "leave",
-            payload: clientId,
-            qos: 1,
-            retain: false
-        }
-    });
 
-    let hemtjanst = new Client(mqtt);
+    if (!args.proxy) {
 
-    new ZVag(zwave, hemtjanst, {
-        name: args.name,
-        clientId: clientId
-    });
+        let htMqtt = connect(args.mqtt, {
+            keepalive: 30,
+            clientId: clientId,
+            will: {
+                topic: "leave",
+                payload: clientId,
+                qos: 1,
+                retain: false
+            }
+        });
+
+        let hemtjanst = new Client(htMqtt);
+
+        new ZVag(zwave, hemtjanst, {
+            name: args.name,
+            clientId: clientId
+        });
+    } else {
+        let mqtt = connect(args.mqtt, { keepalive: 30 });
+        new ZVagProxy(zwave, mqtt, {
+            prefix: args.name
+        });
+    }
 }

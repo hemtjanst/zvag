@@ -87,6 +87,11 @@ export class ZVagValue implements IValue {
     public feature(): {name: string, meta: FeatureMeta} {
         switch(this.class_id) {
             case 37: return {name: "on", meta: {}};
+            case 49:
+                switch(this.index) {
+                    case 4: return {name: "currentPower", meta: {}};
+                }
+                break;
             case 50:
                 switch(this.index) {
                     case 0: return {name: "energyUsed", meta: {}};
@@ -94,6 +99,17 @@ export class ZVagValue implements IValue {
                     case 16: return {name: "currentVoltage", meta: {}};
                     case 20: return {name: "currentAmpere", meta: {}};
                 }
+                break;
+            case 113:
+                switch(this.index) {
+                    case 9: return {name: "contactSensorState", meta: {}};
+                }
+                break;
+            case 128:
+                if (this.index === 0) {
+                    return {name: "batteryLevel", meta: {}};
+                }
+                break;
 
             //case 39: return {name: "brightness", meta: {}};
             //case 49: return {name: "powerLevel", meta: {}};
