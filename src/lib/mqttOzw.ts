@@ -11,7 +11,7 @@ import {
     OZW
 } from "./openzwave-shared";
 import {MqttClient} from "mqtt";
-import {Packet} from "mqtt/types/lib/types";
+import {Packet} from "mqtt-packet";
 
 import * as dbgModule from 'debug';
 import {ICmd} from "./proxy";

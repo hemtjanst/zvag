@@ -1,6 +1,6 @@
 import {IClassId, IHomeId, IIndex, IInstance, INodeId, INodeInfo, IValue, IValueId, OZW} from './openzwave-shared';
 import {MqttClient} from 'mqtt';
-import {Packet} from 'mqtt/types/lib/types';
+import {Packet} from 'mqtt-packet';
 
 import * as dbgModule from 'debug';
 let debug = dbgModule('zvag-proxy');
