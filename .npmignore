@@ -1,6 +1,9 @@
 src
 Dockerfile
-
+.dockerignore
+tslint.json
+tsconfig.json
+.idea
 # Logs
 logs
 *.log
