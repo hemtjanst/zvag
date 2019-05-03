@@ -215,8 +215,8 @@ export class ZVagProxy {
         if (typeof this.nodes[id] === 'undefined') {
             this.nodes[id] = {};
         }
-        this.nodes[id]._ready = true;
-        this.nodes[id]._values = this.values[id].map(v => v.value_id);
+        this.nodes[id].ready = true;
+        this.nodes[id].values = this.values[id].map(v => v.value_id);
         this.onNodeUpdate(id, this.nodes[id]);
     }
 

@@ -1,6 +1,6 @@
 import * as cliArgs from "command-line-args";
 import * as cliUsage from "command-line-usage";
-import {connect} from "mqtt";
+import {connect, IClientOptions} from "mqtt";
 
 import {ZVag} from "./lib/index";
 import {Client} from "hemtjanst/lib/hemtjanst";
@@ -62,18 +62,28 @@ let opts = [
 ];
 
 let args = cliArgs(opts);
+let mqttOpts: IClientOptions = { keepalive: 30 };
 
 if (!args.device) {
-    args.device = "/dev/ttyUSB0";
+    args.device = process.env['ZVAG_DEVICE'] || "/dev/ttyUSB0";
 }
 if (!args.mqtt) {
-    args.mqtt = "tcp://127.0.0.1:1883";
+    args.mqtt = process.env['MQTT_ADDRESS'] || "tcp://127.0.0.1:1883";
 }
+
+if (process.env['MQTT_USERNAME']) mqttOpts.username = process.env['MQTT_USERNAME'];
+if (process.env['MQTT_PASSWORD']) mqttOpts.password = process.env['MQTT_PASSWORD'];
+
 if (!args.name) {
-    args.name = "zwave";
+    args.name = process.env['ZVAG_NAME'] || "zwave";
 }
 if (!args.proxyName) {
-    args.proxyName = "zwave";
+    args.proxyName = process.env['ZVAG_PROXY_NAME'] || "zwave";
+}
+
+if (!args.client && !args.proxy) {
+    args.client = process.env['ZVAG_MODE'] === 'client';
+    args.proxy = process.env['ZVAG_MODE'] === 'proxy';
 }
 
 if (args.help) {
@@ -103,7 +113,7 @@ if (args.help) {
             ConsoleOutput: false
         });
     } else {
-        let mqtt = connect(args.mqtt, { keepalive: 30 });
+        let mqtt = connect(args.mqtt, mqttOpts);
         debug('Creating mqtt -> Z-Wave client');
         zwave = new MqttOzw({
             mqtt: mqtt,
@@ -114,9 +124,7 @@ if (args.help) {
     zwave.connect(args.device);
 
     if (!args.proxy) {
-
-        let htMqtt = connect(args.mqtt, {
-            keepalive: 30,
+        let mqttOpts2:any = {
             clientId: clientId,
             will: {
                 topic: "leave",
@@ -124,7 +132,14 @@ if (args.help) {
                 qos: 1,
                 retain: false
             }
-        });
+        };
+        for (let k in mqttOpts) {
+            if (mqttOpts.hasOwnProperty(k)) {
+                mqttOpts2[k] = mqttOpts[k];
+            }
+        }
+
+        let htMqtt = connect(args.mqtt, mqttOpts2);
 
         let hemtjanst = new Client(htMqtt);
 
@@ -133,9 +148,9 @@ if (args.help) {
             clientId: clientId
         });
     } else {
-        let mqtt = connect(args.mqtt, { keepalive: 30 });
+        let mqtt = connect(args.mqtt, mqttOpts);
         new ZVagProxy(zwave, mqtt, {
-            prefix: args.name
+            prefix: args.proxyName
         });
     }
 }
