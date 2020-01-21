@@ -77,6 +77,9 @@ export class ZVag {
                 let node = this.nodes[i];
                 let name = this.opts.name + i;
                 let type = node.getType();
+                if (type === null) {
+                    continue;
+                }
                 let typeStr = utils.typeName(type, DeviceType);
                 let topic = typeStr+"/"+name;
 

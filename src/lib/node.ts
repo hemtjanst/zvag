@@ -20,6 +20,23 @@ export class ZVagNode {
     }
 
     public getType(): DeviceType {
+
+        let features = {};
+
+        for (let value of this.getValues()) {
+            let ft = value.feature();
+            features[ft.name] = true;
+        }
+
+        // Overrides
+        if (features['on'] && features['currentPower']) {
+            return DeviceType.Outlet;
+        }
+        if (features['contactSensorState']) {
+            return DeviceType.ContactSensor;
+        }
+
+
         switch(this.info.type) {
             case "Power Strip":
             case "On/Off Power Switch":
@@ -34,7 +51,9 @@ export class ZVagNode {
             case "Air Temperature Sensor": return DeviceType.TemperatureSensor;
             case "Luminance Sensor": return DeviceType.LightSensor;
             case "Humidity Sensor": return DeviceType.HumiditySensor;
-            default: return DeviceType.Switch;
+            default:
+                console.log(`No DeviceType available for ${this.info.type}`);
+                return null;
 
             /*<DeviceType key="0x0000" label="Unknown Type" />
   <DeviceType key="0x0100" label="Central Controller" command_classes="0x5a,0x5e,0x59,0x72,0x73,0x85,0x86,0x56,0x22"/>
