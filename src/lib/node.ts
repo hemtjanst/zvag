@@ -25,6 +25,9 @@ export class ZVagNode {
 
         for (let value of this.getValues()) {
             let ft = value.feature();
+            if (ft === null) {
+                continue;
+            }
             features[ft.name] = true;
         }
 
